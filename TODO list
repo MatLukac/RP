@@ -1,7 +1,7 @@
 -zistit ako presne indexuju jednotlive blocky pri bit vektore A, ak indexovanie blokov by malo nastat od 0 
 ale potom vznika chyba pri preteceni pri select-1i(j) 
 
-ímplementovat clarkov select (O(1) time and o(n) space)
+-implementovat clarkov select (O(1) time and o(n) space)
 
 -spravit pri kazdej funkcie panic report pri akych parametroch to skape
 
