@@ -1,0 +1,8 @@
+-zistit ako presne indexuju jednotlive blocky pri bit vektore A, ak indexovanie blokov by malo nastat od 0 
+ale potom vznika chyba pri preteceni pri select-1i(j) 
+
+-spravit pri kazdej funkcie panic report pri akych parametroch to skape
+
+-spravit y-fast trie v ruste (nie je na to crate)
+
+-opravit chyby
