@@ -3,24 +3,21 @@
 use succinct::*;
 use succinct::select::Select0Support;
 use std::fmt;
+#[allow(dead_code)]
 
 
 pub struct BitVectorA{
-    //TODO: odstranit zbytocne veci, ktore netreba
     pub vec: BitVector<u32>,
     pub n: u64,
     pub t: u64,
-    pub jr: JacobsonRank<BitVector<u32>>,
-    pub select: BinSearchSelect<JacobsonRank<BitVector<u32>>>
+    pub rank_select: BinSearchSelect<JacobsonRank<BitVector<u32>>>
 }
 
 pub struct CardinatlityVector{
-    //TODO: odstranit zbytocne veci, ktore netrebas
     pub vec: BitVector<u32>,
     pub n: u64,
     pub t: u64,
-    pub jr: JacobsonRank<BitVector<u32>>,
-    pub select: BinSearchSelect<JacobsonRank<BitVector<u32>>>
+    pub rank_select: BinSearchSelect<JacobsonRank<BitVector<u32>>>
 }
 
 impl fmt::Display for CardinatlityVector {
@@ -31,11 +28,7 @@ impl fmt::Display for CardinatlityVector {
                 if x { print!("1 "); }
 
                 else { print!{"0 "} }; 
-                
-                
             }
-            
-
         }
         print!("\n\n");
         write!(f, "\n{:?}\n lenght : {}\n values: {}\n", self.vec, self.n, self.t)
@@ -62,8 +55,8 @@ impl CardinatlityVector{
             vec: vec,
             n: bitvec.n,
             t: bitvec.t,
-            jr: rank.clone(),
-            select: BinSearchSelect::new(rank)
+
+            rank_select: BinSearchSelect::new(rank)
         }
     }
 }
@@ -114,8 +107,7 @@ impl BitVectorA {
             vec: bitvec, 
             n: array.len() as u64,
             t,
-            jr: rank.clone(),
-            select : BinSearchSelect::new(rank)
+            rank_select : BinSearchSelect::new(rank)
         }
     }
 
@@ -125,30 +117,19 @@ impl BitVectorA {
 
         if i==0 {return Option::Some(0);}
 
-        if c == 1 {
-            return Option::Some(self.jr.rank1(i-1));
-        }
+        if c == 1 { return Option::Some(self.rank_select.rank1(i-1)); }
 
-        else { 
-           return Option::Some(self.jr.rank0(i-1));
-        }
-
-        
+        else { return Option::Some(self.rank_select.rank0(i-1)); }
     }
     
-    pub fn select_a(&self, c: usize, i: u64) -> Option<u64> {
-
+    pub fn select_a(&self, c: usize, i: u64) -> Option<u64> { 
         if i == 0 {return Option::None}
 
-        if c == 1 {
-            return self.select.select1(i);
-        }
+        if c == 1 { return self.rank_select.select1(i); }
 
-        else {
-            return self.select.select0(i);
-        }   
-        
+        else { return self.rank_select.select0(i); }   
     }
+
 
     pub fn rank_b(&self, it: u64) -> Option<u64> { 
         self.rank_a(1, it)
@@ -175,7 +156,7 @@ impl BitVectorA {
         }
 
     }
-
+    #[allow(dead_code)]
     pub fn select(&self, c: u64, i: u64) -> Option<u64> {
         //TODO : checking the code for None values in select and rank
         let x = self.rank_a(1, (c-1)*self.n);
@@ -220,16 +201,39 @@ impl BitVectorA {
         CardinatlityVector::create_from_bit_vector_a(self)
     }
 
+    pub fn get_positions_ones_of_each_block(&self) -> Vec<Vec<u64>> {
+        let mut ret = Vec::new();
+        
+        
+
+
+        let mut block = 0;
+        let mut block: Vec<u64> = Vec::new();
+        for (bit,index ) in self.vec.iter().zip(0..(self.n*self.t)) {
+            if(index % self.t == 0) {
+                ret.push(block);
+                block = Vec::new();
+            }
+
+            if(bit) { block.push(index%self.t)}  
+        }
+
+
+        ret
+    }
+
 }
 
+
+#[allow(dead_code)]
 impl CardinatlityVector{
 
     pub fn rank_b(&self, it: u64) -> Option<u64> {
-        self.select.select0(it/self.t).map(|x: u64| -> u64 {self.jr.rank1(x)})    
+        self.rank_select.select0(it/self.t).map(|x: u64| -> u64 {self.rank_select.rank1(x)})    
     }
 
     pub fn select_b(&self, i: u64) -> Option<u64> {
-        self.select.select1(i).map(|x: u64| -> u64 {self.jr.rank0(x)})
+        self.rank_select.select1(i).map(|x: u64| -> u64 {self.rank_select.rank0(x)})
     }
     
 }
