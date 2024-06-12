@@ -1,5 +1,5 @@
 use std::cmp::min;
-
+//use elias_fano::EliasFano;
 use crate::y_fast::YfastTrie;
 use crate::bit_vector_a::{CardinatlityVector, BitVectorA};
 
@@ -7,7 +7,7 @@ use crate::bit_vector_a::{CardinatlityVector, BitVectorA};
 pub struct FirstStructure {
     cardinality_vector: CardinatlityVector,
     t: u64,
-    eblocks: Vec<Vec<u64>>, //todo: spravit lepsie kodovanie cisiel: tabulka ki*lg(t) bitov
+    eblocks: Vec<Vec<u64>>, //todo: spravit lepsie kodovanie cisiel: tabulka ki*lg(t) bitov | EliasFano, vyzera ako dobra aproximacia
     fblocks: Vec<YfastTrie>
  
     
@@ -21,7 +21,10 @@ impl FirstStructure {
         let mut fblocks: Vec<YfastTrie> = Vec::new();
         let mut eblocks =  bitvec.get_positions_ones_of_each_block();
 
-        for block in &eblocks {
+        // kvoli mojim vypoctom si myslim ze aj ak ma byt v jednom y-fast strome log(ki) (kde ki je dlzka bloku, maximalne ale ki=t) 
+        //tak potom pre "efektivne" implementovanie BBTS by mal obsahovat 1/2log(t) az 2log(t) tak x-fast strom bude mat asi teda iba dva vrcholi v nom oznacene (asi?) (asi sa mylim, co uz)  
+
+        for block in &eblocks { 
             let mut yfast = YfastTrie::new(bitvec.t as i32);
             let mut f = Vec::new(); 
             let log = i32::ilog2(block.len() as i32);
@@ -56,11 +59,9 @@ impl FirstStructure {
 
         let pred = self.fblocks[ith_block as usize].predecessor(position as i32);
         let mut rank_f = 0;
-        if(pred != -1) {
-            rank_f = self.fblocks[ith_block as usize].find(pred);
-        } else {
-            rank_f = 0;
-        } 
+
+        if pred != -1 { rank_f = self.fblocks[ith_block as usize].find(pred); } 
+        else { rank_f = 0; } 
 
         let log = i32::ilog2(self.t as i32) as i32;
         let mut left = rank_f*(log );
@@ -70,14 +71,12 @@ impl FirstStructure {
             let mid = left + (right - left) / 2;
             let mid_val: u32 = self.eblocks[position as usize][mid as usize] as u32;
 
-            if mid_val == position {
-                return mid;
-            } else if mid_val < position {
-                left = mid + 1;
-            } else {
-                right = mid - 1;
-            }
+            if mid_val == position { return mid; } 
+            else if mid_val < position { left = mid + 1; } 
+            else {  right = mid - 1; }
+
         }
+
         min(left, right)
     }
 

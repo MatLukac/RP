@@ -1,11 +1,16 @@
 
+
 use bit_vector_a::*;
 use succinct::Select1Support;
 use y_fast::*;
+use x_fast::*;
+use alv_tree::AVLTree;
 
 mod bit_vector_a;
 mod first_structure;
 mod y_fast;
+mod x_fast;
+mod alv_tree;
 
 
 
@@ -55,31 +60,6 @@ fn main() {
     println!("{}", (bitvec.select_a(1, 4).unwrap() as f64));
     println!("{}", (bitvec.select_a(1, 4).unwrap() as f64 / 10 as f64).floor()); */
 
- 
-       /*  let mut yfast = YFastTrie::new();
-        yfast.insert(42);
-        yfast.insert(100);
-        yfast.insert(25);
-        println!("Inserted 42, 100, and 25 into Y-fast trie");
-
-        println!("find: {}", yfast.find(90));
-
-
-    
-        let pred = yfast.predecessor(42);
-        let succ = yfast.successor(42);
-    
-        println!("Predecessor of 42: {:?}", pred);
-        println!("Successor of 42: {:?}", succ);
-    
-        let pred_100 = yfast.predecessor(100);
-        let succ_25 = yfast.successor(25);
-    
-        println!("Predecessor of 100: {:?}", pred_100);
-        println!("Successor of 25: {:?}", succ_25); */
-
- 
-
 
     let mut trie = YfastTrie::new(1 << 5);
     println!("insert 1, 5, 11, 12");
@@ -106,8 +86,36 @@ fn main() {
         println!("{}\nvalue stored = {}", tmp, trie.find(tmp));
     }
 
+
+/*  let mut tree = AVLTree::new();
+        
+ // Test insertion
+ tree.insert(10);
+ tree.insert(20);
+ tree.insert(5);
+ tree.insert(6);
+ tree.insert(15);
+
+ // Check the in-order traversal of the tree
+ //assert_eq!(tree.inorder(), vec![5, 6, 10, 15, 20]);
+
+ // Test find operation
+ assert!(tree.find(10));
+ assert!(!tree.find(100));
+
+ // Test predecessor and successor
+ assert_eq!(tree.predecessor(15), Some(10));
+ assert_eq!(tree.successor(15), Some(20));
+
+ // Test deletion
+ tree.delete(10);
+ assert!(!tree.find(10)); */
+}
+
+    
+
         
 
     
 
-}
+
