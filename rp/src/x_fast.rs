@@ -185,17 +185,17 @@ impl XfastTrie {
             node.borrow_mut().right = Some(Rc::clone(&suc));
         }
 
-        let mut lvl = 1;
+        let mut ll = 1;
         let mut prefix;
-        while lvl != self.digits {
-            prefix = k >> (self.digits - lvl);
-            if !self.levels[lvl as usize].contains_key(&prefix) {
-                let inter = Rc::new(RefCell::new(Node::new(lvl, 0)));
-                self.levels[lvl as usize].insert(prefix, Rc::clone(&inter));
-                if prefix & 1 != 0 { self.levels[(lvl - 1) as usize][&(prefix >> 1)].borrow_mut().right = Some(Rc::clone(&inter)); } 
-                else { self.levels[(lvl - 1) as usize][&(prefix >> 1)].borrow_mut().left = Some(Rc::clone(&inter)); }
+        while ll != self.digits {
+            prefix = k >> (self.digits - ll);
+            if !self.levels[ll as usize].contains_key(&prefix) {
+                let inter = Rc::new(RefCell::new(Node::new(ll, 0)));
+                self.levels[ll as usize].insert(prefix, Rc::clone(&inter));
+                if prefix & 1 != 0 { self.levels[(ll - 1) as usize][&(prefix >> 1)].borrow_mut().right = Some(Rc::clone(&inter)); } 
+                else { self.levels[(ll - 1) as usize][&(prefix >> 1)].borrow_mut().left = Some(Rc::clone(&inter)); }
             }
-            lvl += 1;
+            ll += 1;
         }
 
 
@@ -207,15 +207,15 @@ impl XfastTrie {
 
 
         prefix = k;
-        lvl = self.digits - 1;
+        ll = self.digits - 1;
 
-        while lvl != 0 {
+        while ll != 0 {
             prefix >>= 1;
-            let mut entry = self.levels[lvl as usize][&prefix].borrow_mut();
+            let mut entry = self.levels[ll as usize][&prefix].borrow_mut();
             if entry.left.is_none() { entry.left = Some(Rc::clone(&self.most_left_list(Rc::clone(entry.right.as_ref().unwrap()))));  } 
             else if entry.right.is_none() { entry.right = Some(Rc::clone(&self.right_most_list(Rc::clone(entry.left.as_ref().unwrap())))); }
             else {;}
-            lvl -= 1;
+            ll -= 1;
         }
         
         let mut root = self.levels[0][&0].borrow_mut();
